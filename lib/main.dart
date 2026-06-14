@@ -1,6 +1,12 @@
 import 'package:flutter/material.dart';
 import 'dart:math' as Math;
 
+// CECS 453
+// Lab assignment 4
+// Just Me: Carlos Aguilera
+// Video link: https://www.loom.com/share/34b3a3e3bcba45038c89824b46d96f77
+// GitHub repo: https://github.com/devloos/cecs-453-mortgage-app
+
 enum Years { ten, fifteen, thirty }
 
 class Mortgage {
