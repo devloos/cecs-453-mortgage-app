@@ -67,9 +67,9 @@ class _HomeScreenState extends State<HomeScreen> {
     interestRate: 0.035,
   );
 
-  String _calculateMonthlyPayment() {
+  double _calculateMonthlyPayment() {
     if (_selectedMortgage == null) {
-      return '0.00';
+      return 0.00;
     }
 
     final amount = _selectedMortgage!.amount;
@@ -81,7 +81,16 @@ class _HomeScreenState extends State<HomeScreen> {
         interestRate *
         Math.pow(1 + interestRate, totalMonths) /
         (Math.pow(1 + interestRate, totalMonths) - 1);
-    return monthlyPayment.toStringAsFixed(2);
+
+    return monthlyPayment;
+  }
+
+  double _calculateTotalPayment() {
+    if (_selectedMortgage == null) {
+      return 0.00;
+    }
+
+    return (_calculateMonthlyPayment() * _selectedMortgage!.totalMonths);
   }
 
   @override
@@ -123,15 +132,31 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ],
               ),
+              SizedBox(height: 20),
               Divider(color: Colors.grey),
+              SizedBox(height: 10),
               Row(
                 children: [
                   Text('Monthly Payment:', style: TextStyle(fontSize: 20)),
                   SizedBox(width: 30),
-                  Text("\$${_calculateMonthlyPayment()}"),
+                  Text(
+                    "\$${_calculateMonthlyPayment().toStringAsFixed(2)}",
+                    style: TextStyle(fontSize: 20),
+                  ),
                 ],
               ),
-              SizedBox(height: 20),
+              SizedBox(height: 10),
+              Row(
+                children: [
+                  Text('Total Payment:', style: TextStyle(fontSize: 20)),
+                  SizedBox(width: 30),
+                  Text(
+                    "\$${_calculateTotalPayment().toStringAsFixed(2)}",
+                    style: TextStyle(fontSize: 20),
+                  ),
+                ],
+              ),
+              SizedBox(height: 40),
               ElevatedButton(
                 child: Text('Modify Mortgage'),
                 onPressed: () async {
