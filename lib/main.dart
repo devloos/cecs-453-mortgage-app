@@ -85,6 +85,8 @@ class _HomeScreenState extends State<HomeScreen> {
     interestRate: 0.035,
   );
 
+  bool _isSelected = false;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -97,7 +99,7 @@ class _HomeScreenState extends State<HomeScreen> {
               Row(
                 children: [
                   Text('Years:', style: TextStyle(fontSize: 20)),
-                  SizedBox(width: 30),
+                  SizedBox(width: 100),
                   Text(
                     _selectedMortgage?.yearsInt.toString() ?? '0',
                     style: TextStyle(fontSize: 20),
@@ -107,7 +109,7 @@ class _HomeScreenState extends State<HomeScreen> {
               Row(
                 children: [
                   Text('Amount:', style: TextStyle(fontSize: 20)),
-                  SizedBox(width: 30),
+                  SizedBox(width: 80),
                   Text(
                     "\$${_selectedMortgage?.amount.toStringAsFixed(2)}",
                     style: TextStyle(fontSize: 20),
@@ -117,7 +119,7 @@ class _HomeScreenState extends State<HomeScreen> {
               Row(
                 children: [
                   Text('Interest Rate:', style: TextStyle(fontSize: 20)),
-                  SizedBox(width: 30),
+                  SizedBox(width: 35),
                   Text(
                     _selectedMortgage?.formattedInterestRate ?? '0.00%',
                     style: TextStyle(fontSize: 20),
@@ -141,14 +143,70 @@ class _HomeScreenState extends State<HomeScreen> {
               Row(
                 children: [
                   Text('Total Payment:', style: TextStyle(fontSize: 20)),
-                  SizedBox(width: 30),
+                  SizedBox(width: 57),
                   Text(
                     "\$${_selectedMortgage?.calculateTotalPayment().toStringAsFixed(2)}",
                     style: TextStyle(fontSize: 20),
                   ),
                 ],
               ),
-              SizedBox(height: 40),
+
+              SizedBox(height: 20),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  TextButton(
+                    onPressed: () {
+                      showDialog(
+                        context: context,
+                        builder: (context) => AlertDialog(
+                          title: Text(
+                            'Terms and Conditions',
+                            style: TextStyle(fontSize: 20),
+                          ),
+                          content: Text('I agree to the terms and conditions'),
+                          actions: [
+                            TextButton(
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                                setState(() {
+                                  _isSelected = false;
+                                });
+                              },
+                              child: Text(
+                                'I disagree',
+                                style: TextStyle(color: Colors.red),
+                              ),
+                            ),
+                            TextButton(
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                                setState(() {
+                                  _isSelected = true;
+                                });
+                              },
+                              child: Text('I agree'),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                    child: Text(
+                      'Terms and Conditions',
+                      style: TextStyle(fontSize: 20, color: Colors.black87),
+                    ),
+                  ),
+                  Checkbox(
+                    value: _isSelected,
+                    onChanged: (value) {
+                      setState(() {
+                        _isSelected = value ?? false;
+                      });
+                    },
+                  ),
+                ],
+              ),
+              SizedBox(height: 20),
               ElevatedButton(
                 child: Text('Modify Mortgage'),
                 onPressed: () async {
@@ -173,6 +231,8 @@ class _HomeScreenState extends State<HomeScreen> {
 }
 
 class MortgageSelectionScreen extends StatefulWidget {
+  const MortgageSelectionScreen({super.key});
+
   @override
   _MortgageSelectionScreenState createState() =>
       _MortgageSelectionScreenState();
