@@ -33,6 +33,24 @@ class Mortgage {
     final interestRate = this.interestRate * 100;
     return '${interestRate.toStringAsFixed(2)}%';
   }
+
+  double calculateMonthlyPayment() {
+    final amount = this.amount;
+    final interestRate = this.interestRate / 12;
+    final totalMonths = this.totalMonths;
+
+    final monthlyPayment =
+        amount *
+        interestRate *
+        Math.pow(1 + interestRate, totalMonths) /
+        (Math.pow(1 + interestRate, totalMonths) - 1);
+
+    return monthlyPayment;
+  }
+
+  double calculateTotalPayment() {
+    return (calculateMonthlyPayment() * totalMonths);
+  }
 }
 
 void main() {
@@ -66,32 +84,6 @@ class _HomeScreenState extends State<HomeScreen> {
     amount: 100000,
     interestRate: 0.035,
   );
-
-  double _calculateMonthlyPayment() {
-    if (_selectedMortgage == null) {
-      return 0.00;
-    }
-
-    final amount = _selectedMortgage!.amount;
-    final interestRate = _selectedMortgage!.interestRate / 12;
-    final totalMonths = _selectedMortgage!.totalMonths;
-
-    final monthlyPayment =
-        amount *
-        interestRate *
-        Math.pow(1 + interestRate, totalMonths) /
-        (Math.pow(1 + interestRate, totalMonths) - 1);
-
-    return monthlyPayment;
-  }
-
-  double _calculateTotalPayment() {
-    if (_selectedMortgage == null) {
-      return 0.00;
-    }
-
-    return (_calculateMonthlyPayment() * _selectedMortgage!.totalMonths);
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -140,7 +132,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   Text('Monthly Payment:', style: TextStyle(fontSize: 20)),
                   SizedBox(width: 30),
                   Text(
-                    "\$${_calculateMonthlyPayment().toStringAsFixed(2)}",
+                    "\$${_selectedMortgage?.calculateMonthlyPayment().toStringAsFixed(2)}",
                     style: TextStyle(fontSize: 20),
                   ),
                 ],
@@ -151,7 +143,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   Text('Total Payment:', style: TextStyle(fontSize: 20)),
                   SizedBox(width: 30),
                   Text(
-                    "\$${_calculateTotalPayment().toStringAsFixed(2)}",
+                    "\$${_selectedMortgage?.calculateTotalPayment().toStringAsFixed(2)}",
                     style: TextStyle(fontSize: 20),
                   ),
                 ],
