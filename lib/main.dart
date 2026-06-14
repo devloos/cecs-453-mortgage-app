@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'dart:math' as Math;
 
 enum Years { ten, fifteen, thirty }
 
@@ -12,6 +13,26 @@ class Mortgage {
     required this.amount,
     required this.interestRate,
   });
+
+  int get yearsInt {
+    switch (years) {
+      case Years.ten:
+        return 10;
+      case Years.fifteen:
+        return 15;
+      case Years.thirty:
+        return 30;
+    }
+  }
+
+  int get totalMonths {
+    return yearsInt * 12;
+  }
+
+  String get formattedInterestRate {
+    final interestRate = this.interestRate * 100;
+    return '${interestRate.toStringAsFixed(2)}%';
+  }
 }
 
 void main() {
@@ -46,34 +67,88 @@ class _HomeScreenState extends State<HomeScreen> {
     interestRate: 0.035,
   );
 
+  String _calculateMonthlyPayment() {
+    if (_selectedMortgage == null) {
+      return '0.00';
+    }
+
+    final amount = _selectedMortgage!.amount;
+    final interestRate = _selectedMortgage!.interestRate / 12;
+    final totalMonths = _selectedMortgage!.totalMonths;
+
+    final monthlyPayment =
+        amount *
+        interestRate *
+        Math.pow(1 + interestRate, totalMonths) /
+        (Math.pow(1 + interestRate, totalMonths) - 1);
+    return monthlyPayment.toStringAsFixed(2);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text('Mortgage Calculator')),
       body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            ElevatedButton(
-              child: Text('Calculate Mortgage'),
-              onPressed: () async {
-                final selectedMortgage = await Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (context) => MortgageSelectionScreen(),
+        child: Container(
+          padding: EdgeInsets.all(20),
+          child: Column(
+            children: [
+              Row(
+                children: [
+                  Text('Years:', style: TextStyle(fontSize: 20)),
+                  SizedBox(width: 30),
+                  Text(
+                    _selectedMortgage?.yearsInt.toString() ?? '0',
+                    style: TextStyle(fontSize: 20),
                   ),
-                );
-                if (selectedMortgage != null) {
-                  setState(() {
-                    _selectedMortgage = selectedMortgage;
-                  });
-                }
-              },
-            ),
-            SizedBox(height: 20),
-            Text('Selected Years: ${_selectedMortgage?.years}'),
-            Text('Selected Amount: ${_selectedMortgage?.amount}'),
-            Text('Selected Interest Rate: ${_selectedMortgage?.interestRate}'),
-          ],
+                ],
+              ),
+              Row(
+                children: [
+                  Text('Amount:', style: TextStyle(fontSize: 20)),
+                  SizedBox(width: 30),
+                  Text(
+                    "\$${_selectedMortgage?.amount.toStringAsFixed(2)}",
+                    style: TextStyle(fontSize: 20),
+                  ),
+                ],
+              ),
+              Row(
+                children: [
+                  Text('Interest Rate:', style: TextStyle(fontSize: 20)),
+                  SizedBox(width: 30),
+                  Text(
+                    _selectedMortgage?.formattedInterestRate ?? '0.00%',
+                    style: TextStyle(fontSize: 20),
+                  ),
+                ],
+              ),
+              Divider(color: Colors.grey),
+              Row(
+                children: [
+                  Text('Monthly Payment:', style: TextStyle(fontSize: 20)),
+                  SizedBox(width: 30),
+                  Text("\$${_calculateMonthlyPayment()}"),
+                ],
+              ),
+              SizedBox(height: 20),
+              ElevatedButton(
+                child: Text('Modify Mortgage'),
+                onPressed: () async {
+                  final selectedMortgage = await Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) => MortgageSelectionScreen(),
+                    ),
+                  );
+                  if (selectedMortgage != null) {
+                    setState(() {
+                      _selectedMortgage = selectedMortgage;
+                    });
+                  }
+                },
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -92,7 +167,7 @@ class _MortgageSelectionScreenState extends State<MortgageSelectionScreen> {
     text: '100000',
   );
   final TextEditingController _interestRateController = TextEditingController(
-    text: '0.05',
+    text: '0.035',
   );
 
   @override
@@ -131,6 +206,7 @@ class _MortgageSelectionScreenState extends State<MortgageSelectionScreen> {
               decoration: InputDecoration(labelText: 'Interest Rate'),
             ),
           ),
+          SizedBox(height: 20),
           ElevatedButton(
             onPressed: () {
               Navigator.of(context).pop(
